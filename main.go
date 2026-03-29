@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"mime/multipart"
@@ -21,12 +22,11 @@ var SupportedBanks = map[string]bool{
 	"halifax":  true,
 	"barclays": true,
 }
-
 var AcceptedFileTypes = map[string]bool{
 	// "image/png":  true,
-	"text/csv":   true,
+	"text/csv": true,
 	// "image/jpeg": true,
-	"text":       true,
+	"text": true,
 }
 
 func serverHome(w http.ResponseWriter, r *http.Request) {
@@ -84,7 +84,19 @@ func handleUpload(w http.ResponseWriter, r *http.Request) {
 		bankType: bankType,
 	}
 
-	processFile(f, w, r)
+	// processFile(f, w, r)
+	res, err := f.handleMonzoBankStatement()
+	if err != nil {
+		log.Println(err)
+		http.ServeFile(w, r, "index.html")
+		return
+	}
+
+	w.Header().Set("content-type", "application/json")
+	if err := json.NewEncoder(w).Encode(res); err != nil {
+		log.Printf("failed to encode response to send -> \n %s\n", err)
+		return
+	}
 }
 
 func main() {
