@@ -29,10 +29,6 @@ var AcceptedFileTypes = map[string]bool{
 	"text": true,
 }
 
-func serverHome(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "index.html")
-}
-
 type File struct {
 	file     multipart.File
 	name     string
@@ -40,6 +36,12 @@ type File struct {
 }
 
 func handleUpload(w http.ResponseWriter, r *http.Request) {
+	enableCORS(w)
+	if r.Method == "OPTIONS" {
+		log.Println("preflight request made");
+		log.Printf("%+v\n", r);
+		return
+	}
 	if r.Method != http.MethodPost {
 		http.ServeFile(w, r, "index.html")
 		return
@@ -84,7 +86,6 @@ func handleUpload(w http.ResponseWriter, r *http.Request) {
 		bankType: bankType,
 	}
 
-	// processFile(f, w, r)
 	res, err := f.handleMonzoBankStatement()
 	if err != nil {
 		log.Println(err)
@@ -100,7 +101,8 @@ func handleUpload(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	http.HandleFunc("/", serverHome)
+	// http.HandleFunc("/", serverHome)
+	http.Handle("/", http.FileServer(http.Dir("./ui")))
 	http.HandleFunc("/upload", handleUpload)
 	log.Printf("server running at http://%s\n", Addr)
 	if err := http.ListenAndServe(Addr, nil); err != nil {

@@ -1,73 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>trx-app</title>
-    <style>
-        body {
-            background-color: black;
-            color: white;
-            font-family: monospace;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-        }
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>trx-app</title>
+	<style>
+		body {
+			background-color: black;
+			color: white;
+			font-family: monospace;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			height: 100vh;
+			margin: 0;
+		}
 
-        form {
-            border: 1px solid white;
-            padding: 2rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
+		form {
+			border: 1px solid white;
+			padding: 2rem;
+			display: flex;
+			flex-direction: column;
+			gap: 1rem;
+		}
 
-        button {
-            background: white;
-            color: black;
-            border: none;
-            padding: 0.5rem 1rem;
-            cursor: pointer;
-            font-family: monospace;
-        }
+		button {
+			background: white;
+			color: black;
+			border: none;
+			padding: 0.5rem 1rem;
+			cursor: pointer;
+			font-family: monospace;
+		}
 
-        button:hover {
-            background: #ccc;
-        }
+		button:hover {
+			background: #ccc;
+		}
 
-        .error {
-            color: red;
-        }
-    </style>
+		.error {
+			color: red;
+		}
+	</style>
 </head>
+
 <body>
-    <h2>hello!! Pickle rick!!</h2>
+	<h2>hello!! Pickle rick!!</h2>
 
-    <!-- {% if message %} -->
-    <!--     <p>{{ message }}</p> -->
-    <!-- {% endif %} -->
-
-    <!-- {% if errors %} -->
-    <!--     {% for err in errors %} -->
-    <!--         <p class="error">{{ err }}</p> -->
-    <!--     {% endfor %} -->
-    <!-- {% endif %} -->
-
-    <form method="POST" action="/upload" enctype="multipart/form-data">
-        <p>Welcome to trx-app</p>
-        <input type="file" name="user_file" accept="text">
-        <select name="bank_type">
-            <option value="" disabled selected>select bank</option>
-            <option value="monzo">monzo</option>
-            <option value="barclays">barclays</option>
-            <option value="halifax">halifax</option>
-            <option value="revolut">revolut</option>
-        </select>
-        <button type="submit">upload</button>
-    </form>
+	<!-- method="POST" action="/upload"  -->
+	<form enctype="multipart/form-data">
+		<p>Welcome to trx-app</p>
+		<input type="file" name="user_file" accept="text">
+		<select name="bank_type">
+			<option value="" disabled selected>select bank</option>
+			<option value="monzo">monzo</option>
+			<option value="barclays">barclays</option>
+			<option value="halifax">halifax</option>
+			<option value="revolut">revolut</option>
+		</select>
+		<button type="submit">upload</button>
+	</form>
+	<script src="./ui/dist/main.js"></script>
 </body>
-</html>
 
+</html>

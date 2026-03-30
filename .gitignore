@@ -1,1 +1,4 @@
 assets/
+**/dist
+**node_modules/
+/ui/node_modules
