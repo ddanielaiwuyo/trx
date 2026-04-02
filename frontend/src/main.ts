@@ -11,7 +11,7 @@ type Response = {
 	code: number
 }
 
-async function get_albums(url: string): Promise<Album[] | Response> {
+async function getAlbums(url: string): Promise<Album[] | Response> {
 	try {
 		const response = await fetch(url, {
 			method: "GET",
@@ -35,6 +35,22 @@ async function get_albums(url: string): Promise<Album[] | Response> {
 
 }
 
+async function submitForm(form: FormData) {
+	const url = "http://localhost:8080/upload"
+	try {
+		const response = await fetch(url, {
+			method: "POST",
+			body: form,
+		})
+
+		const message = await response.json()
+		console.log("Response from server -> ", message)
+	} catch (err) {
+		console.error("Could not submit form:", err)
+		return
+	}
+}
+
 const URL = "http://localhost:8080/albums"
 function main() {
 	const btn = document.querySelector(".get-albums")
@@ -44,7 +60,7 @@ function main() {
 	}
 
 	btn.addEventListener("click", async (evt) => {
-		const res = await get_albums(URL)
+		const res = await getAlbums(URL)
 		if (Array.isArray(res)) {
 			res.forEach((album) => {
 				console.log(album)
@@ -52,7 +68,26 @@ function main() {
 		} else {
 			console.log("Got a message from server: ", res)
 		}
+
 	})
+
+	const uploadForm = document.querySelector(".upload-form") as HTMLFormElement
+	if (!uploadForm) {
+		console.error("Could not find .upload-form on DOM")
+		return
+	}
+
+	uploadForm?.addEventListener("submit", async (evt) => {
+		evt.preventDefault()
+		await submitForm(new FormData(uploadForm))
+	})
+
+
 }
 
-main()
+
+try {
+	main()
+} catch (err) {
+	console.error("Error", err)
+}

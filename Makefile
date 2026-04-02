@@ -1,2 +1,2 @@
 dev-backend:
-	go run ./cmd/server/*.go
+	go run ./cmd/server.go

@@ -5,7 +5,7 @@
 	<meta charset="UTF-8" />
 	<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>frontend</title>
+	<title>TraxApp</title>
 </head>
 
 <body>
@@ -13,6 +13,16 @@
 	<button class="get-albums">Get Albums</button>
 
 	<div id="app">Caravan</div>
+
+	<form class="upload-form" enctype="multipart/form-data">
+		<label> Bank Statement </label>
+		<input type="file" name="bankStatement" accept="text/csv" /> <br>
+
+		<label> Bank Name </label>
+		<input type="text" name="bankName" /> <br>
+
+		<button> Submit </button>
+	</form>
 	<script type="module" src="/src/main.ts"></script>
 </body>
 

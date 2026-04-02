@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/persona-mp3/api"
 	"github.com/persona-mp3/internal"
 )
 
@@ -56,6 +57,7 @@ func main() {
 	})
 
 	router.POST("/albums", addAlbum)
+	router.POST("/upload", api.UploadBankStatement)
 	router.GET("/albums", getAlbums)
 	router.GET("/albums/:id", getAlbumById)
 	router.Run("localhost:8080")
