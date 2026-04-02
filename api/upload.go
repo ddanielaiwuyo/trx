@@ -2,6 +2,7 @@ package api
 
 import (
 	"log"
+	"net/http"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -14,13 +15,13 @@ func UploadBankStatement(c *gin.Context) {
 	fileHeaders, err := c.FormFile("bankStatement")
 	if err != nil {
 		logger.Println("Could not get bankStatement: ", err)
-		c.IndentedJSON(200, gin.H{"error": err.Error()})
+		c.IndentedJSON(http.StatusOK, gin.H{"error": err.Error()})
 		return
 	}
 
 	if fileHeaders == nil {
 		logger.Println("No file provided: ", fileHeaders)
-		c.IndentedJSON(400, gin.H{"error": "No file provided"})
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "No file provided"})
 		return
 	}
 
@@ -29,23 +30,23 @@ func UploadBankStatement(c *gin.Context) {
 
 	file, err := fileHeaders.Open()
 	if err != nil {
-		c.IndentedJSON(400, gin.H{"error": "No MIME Header was provided"})
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "No MIME Header was provided"})
 		return
 	}
 
 	f := File{F: file, BankName: bankName}
 	bank := getBank(f)
 	if bank == nil {
-		c.IndentedJSON(400, gin.H{"message": "Bank not supported"})
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Bank not supported"})
 		return
 	}
 
 	res, err := bank.GetCanonData()
 	if err != nil {
-		c.IndentedJSON(400, gin.H{"error": err.Error()})
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	c.IndentedJSON(200, res)
+	c.IndentedJSON(http.StatusOK, res)
 }
 
 func getBank(f File) Bank {
