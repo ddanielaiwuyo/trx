@@ -129,6 +129,7 @@ func (m *MonzoBank) GetCanonData() (*CanonResponseJSON, error) {
 		return nil, fmt.Errorf("Could not filter dataframe: %w", df.Err)
 	}
 
+	// We need to clone the dataframe after every filter
 	newClone := m.originalDf.Copy()
 
 	for newCol, oldCol := range renameColumns {
