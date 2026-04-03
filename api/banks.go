@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 	"io"
+	"math"
 	"mime/multipart"
 	"strings"
 
@@ -14,9 +15,9 @@ import (
 // And the return values will eventually have to be of a specific
 // type, so we can map them out on the FE and for consistency
 
-// Today, we'll get this api to send CanonResponseJSON for the Monzo and Halifax
+// Today, we'll get this api to send CanonDataJSON for the Monzo and Halifax
 // And then use ChartJS on the FE
-type CanonResponseJSON struct {
+type CanonDataJSON struct {
 	AvgOut     float64   `json:"average_spent"`
 	TotalOut   float64   `json:"total_out"`
 	HighestOut float64   `json:"highest_out"`
@@ -31,7 +32,7 @@ type ExtraDataResponseJSON struct{}
 
 type Bank interface {
 	GetDataframe() (*dataframe.DataFrame, error)
-	GetCanonData() (*CanonResponseJSON, error)
+	GetCanonData() (*CanonDataJSON, error)
 	GetExtraData() (*ExtraDataResponseJSON, error)
 }
 
@@ -90,7 +91,7 @@ func (m *MonzoBank) GetDataframe() (*dataframe.DataFrame, error) {
 	return &clonedDf, nil
 }
 
-func (m *MonzoBank) GetCanonData() (*CanonResponseJSON, error) {
+func (m *MonzoBank) GetCanonData() (*CanonDataJSON, error) {
 	df, err := m.GetDataframe()
 	if err != nil {
 		return nil, err
@@ -104,7 +105,7 @@ func (m *MonzoBank) GetCanonData() (*CanonResponseJSON, error) {
 		}
 	}
 
-	var cr CanonResponseJSON
+	var cr CanonDataJSON
 
 	clone = clone.Filter(
 		dataframe.F{
@@ -120,9 +121,10 @@ func (m *MonzoBank) GetCanonData() (*CanonResponseJSON, error) {
 
 	logger.Println("Cloned Filter")
 	inCol := clone.Col("In")
-	cr.AvgIn = inCol.Mean()
-	cr.TotalIn = inCol.Sum()
-	cr.HighestIn = inCol.Max()
+	cr.AvgIn = math.Round(inCol.Mean()*100) / 100
+	cr.TotalIn = math.Round(inCol.Sum()*100) / 100
+
+	cr.HighestIn = math.Round(inCol.Max()*100) / 100
 	cr.InValues = inCol.Float()
 
 	if df.Err != nil {
@@ -141,16 +143,16 @@ func (m *MonzoBank) GetCanonData() (*CanonResponseJSON, error) {
 
 	newClone = newClone.Filter(
 		dataframe.F{
-			Colname: "Out",
+			Colname:    "Out",
 			Comparator: series.Less,
 			Comparando: 0,
 		},
 	)
 
 	outCol := newClone.Col("Out")
-	cr.AvgOut = outCol.Mean()
-	cr.TotalOut = outCol.Sum()
-	cr.HighestOut = outCol.Min()
+	cr.AvgOut = math.Round(outCol.Mean()*100) / 100
+	cr.TotalOut = math.Round(outCol.Sum()*100) / 100
+	cr.HighestOut = math.Round(outCol.Min()*100) / 100
 	cr.OutValues = outCol.Float()
 
 	return &cr, nil

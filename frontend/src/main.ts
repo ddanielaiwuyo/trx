@@ -1,41 +1,27 @@
 import './style.css'
-type Album = {
-	id: number
-	title: string
-	artist: string
-	price: number
+import { DOMUtils } from "./utils"
+
+type CanonData = {
+	average_spent: number
+	total_out: number
+	highest_out: number
+	highest_in: number
+	average_in: number
+	total_in: number
+	out_values: number[]
+	in_values: number[]
+
 }
 
-type Response = {
-	message: string
+
+type Response<T> = {
+	data: T
 	code: number
+	message: string
 }
 
-async function getAlbums(url: string): Promise<Album[] | Response> {
-	try {
-		const response = await fetch(url, {
-			method: "GET",
-			headers: {
-				"Content-Type": "application/json",
-				// "X-TrxApp": "your_jwt_token",
-			}
-		})
 
-		if (response.status != 200) {
-			console.warn("Server did not return an OK response", response.status)
-			const serverResponse = await response.json()
-			return serverResponse
-		}
-		const data: Album[] = await response.json()
-		return data
-
-	} catch (err) {
-		throw new Error("Could not get response from server")
-	}
-
-}
-
-async function submitForm(form: FormData) {
+async function submitForm(form: FormData): Promise<Response<CanonData>> {
 	const url = "http://localhost:8080/upload"
 	try {
 		const response = await fetch(url, {
@@ -43,34 +29,15 @@ async function submitForm(form: FormData) {
 			body: form,
 		})
 
-		const message = await response.json()
-		console.log("Response from server -> ", message)
+		const r: Response<CanonData> = await response.json()
+		return r
 	} catch (err) {
-		console.error("Could not submit form:", err)
-		return
+		console.error("Unexpected error occured. ", err)
+		throw new Error("Could not submitForm to server")
 	}
 }
 
-const URL = "http://localhost:8080/albums"
 function main() {
-	const btn = document.querySelector(".get-albums")
-	if (!btn) {
-		console.error("Could not find button with class: get-albums")
-		return
-	}
-
-	btn.addEventListener("click", async (evt) => {
-		const res = await getAlbums(URL)
-		if (Array.isArray(res)) {
-			res.forEach((album) => {
-				console.log(album)
-			})
-		} else {
-			console.log("Got a message from server: ", res)
-		}
-
-	})
-
 	const uploadForm = document.querySelector(".upload-form") as HTMLFormElement
 	if (!uploadForm) {
 		console.error("Could not find .upload-form on DOM")
@@ -79,11 +46,35 @@ function main() {
 
 	uploadForm?.addEventListener("submit", async (evt) => {
 		evt.preventDefault()
-		await submitForm(new FormData(uploadForm))
+		let response = await submitForm(new FormData(uploadForm))
+
+		if (response.message !== "Success") {
+			console.warn("Server did not respond with a Success Message", response)
+			return
+		}
+
+		displayCanonData(response.data)
 	})
 
 
 }
+
+function displayCanonData(data: CanonData) {
+	let error = document.createElement("dev-error")
+	console.log("CanonData >>", data)
+	DOMUtils.removeEl(".upload-form")
+	let totalInEl = DOMUtils.getEl(".total-in")
+	let totalOutEl = DOMUtils.getEl(".total-out")
+	if (!totalInEl || !totalOutEl) {
+		console.error("Could not get total-in and total-out for displayCanonData")
+		error.innerText = "Could not get total-in and total-out for displayCanonData"
+		return
+	}
+
+	totalInEl.innerText = `Total Money In: ${data.total_in}`
+	totalOutEl.innerText = `Total Money Out: ${data.total_out}`
+}
+
 
 
 try {

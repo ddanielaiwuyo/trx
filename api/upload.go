@@ -10,6 +10,12 @@ import (
 
 var logger = log.New(os.Stdout, "", log.Lshortfile|log.LstdFlags)
 
+type Response struct {
+	Message string `json:"message"`
+	Code    int    `json:"code"`
+	Data    any    `json:"data"`
+}
+
 func UploadBankStatement(c *gin.Context) {
 	logger.Println("Client uploaded a file")
 	fileHeaders, err := c.FormFile("bankStatement")
@@ -42,11 +48,18 @@ func UploadBankStatement(c *gin.Context) {
 	}
 
 	res, err := bank.GetCanonData()
+	_ = res
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	c.IndentedJSON(http.StatusOK, res)
+
+	r := &Response{
+		Message: "Success",
+		Code:    http.StatusOK,
+		Data:    res,
+	}
+	c.IndentedJSON(http.StatusOK, r)
 }
 
 func getBank(f File) Bank {
